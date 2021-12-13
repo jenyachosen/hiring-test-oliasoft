@@ -1,0 +1,12 @@
+test:
+  image: node:14
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - npm install --progress=false --no-save
+    - npm run test
+
+cache:
+  paths:
+    - node_modules/
