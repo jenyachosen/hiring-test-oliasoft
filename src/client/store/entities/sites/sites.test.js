@@ -28,11 +28,11 @@ describe('employees', () => {
   */
 
   it('should handle initial state', () => {
-    expect(sites(undefined, {})).toEqual({list: [], loading: false})
+    expect(sites(undefined, {})).toEqual({list: [], loading: false, searchString: ''})
   });
 
   it('should set loading when requested', () => {
-    expect(sites({list: [], loading: false}, sitesRequested()))
-      .toEqual({list: [], loading: true})
+    expect(sites({list: [], loading: false, searchString: ''}, sitesRequested()))
+      .toEqual({list: [], loading: true, searchString: ''})
   });
 });

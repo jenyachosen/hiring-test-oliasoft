@@ -1,12 +1,12 @@
 import React from 'react';
 import {Heading, Page, Button} from '~gui-library';
-import {OilRigs} from "~client/components/oil-rigs/oil-rigs";
+import {Chart} from "~client/components/chart/chart";
 import {Link} from "react-router-dom";
-import styles from './oil.module.less';
+import styles from './chart.module.less';
 
-export const Oil = ({}) => {
+export const ChartView = ({}) => {
   return (
-    <div className={styles.oilHeader}>
+    <div className={styles.chartHeader}>
       <Page left={0}>
         <Heading top>Hiring Challenge</Heading>
         <Link to="/">
@@ -16,7 +16,7 @@ export const Oil = ({}) => {
             colored="orange"
           />
         </Link>
-        <OilRigs/>
+        <Chart/>
       </Page>
     </div>
   );

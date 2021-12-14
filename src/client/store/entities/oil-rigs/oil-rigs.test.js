@@ -28,11 +28,11 @@ describe('employees', () => {
   */
 
   it('should handle initial state', () => {
-    expect(oilRigs(undefined, {})).toEqual({list: [], loading: false})
+    expect(oilRigs(undefined, {})).toEqual({listOfRigs: [], loading: false, searchString: ''})
   });
 
   it('should set loading when requested', () => {
-    expect(oilRigs({list: [], loading: false}, oilRigsRequested()))
-      .toEqual({list: [], loading: true})
+    expect(oilRigs({list: [], loading: false, searchString: ''}, oilRigsRequested()))
+      .toEqual({list: [], loading: true, searchString: ''})
   });
 });

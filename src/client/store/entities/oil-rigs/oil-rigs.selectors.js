@@ -11,12 +11,12 @@ const listOfOilRigs = createSelector(
 );
 
 export const selectFilteredRigs = createSelector(
-  selectSearchString,
-  listOfOilRigs,
+  [selectSearchString,
+  listOfOilRigs],
   (search, rigs) => search.length > 1 ? rigs.filter(rig => {
     const lowerSearch = search.toLowerCase();
-    const lowerNames = rig.name.toLowerCase().split(' ');
-    return lowerNames.some(name => name.indexOf(lowerSearch) === 0);
+    const lowerNames = rig?.name.toLowerCase();
+    return lowerNames.includes(lowerSearch);
   }) : rigs
 );
 

@@ -1,22 +1,32 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import {Card, Drawer, List, Text} from '~gui-library';
-import {selectSiteDetails} from "~store/entities/sites/sites.selectors";
+import styles from './site-details.module.less';
 
-export const SiteDetails = () => {
-  const siteDetails = useSelector(selectSiteDetails);
+export const SiteDetails = ({site}) => {
+  const items = site.oilRigs
+    .filter(rig => rig)
+    .map(rig => ({...rig, details: rig.manufacturer}));
 
-  return <Card>
-      <Text>{siteDetails.name}</Text>
-      <p>{siteDetails.country}</p>
-      <Drawer open background="#f5f7f9">
-        <List
-          list={{
-            name: 'Oil Rigs',
-            items: siteDetails.oilRigs,
-          }}
-          bordered
-        />
-      </Drawer>
-    </Card>
+  return (
+    <div className={styles.siteDetails}>
+      <Card>
+        <Text>{site.name}</Text>
+        <p>{site.country}</p>
+        <Drawer open background="#f5f7f9">
+          <List
+            list={{
+              name: 'Oil Rigs',
+              items
+            }}
+            bordered
+          />
+        </Drawer>
+      </Card>
+    </div>
+  )
 }
+
+SiteDetails.propTypes = {
+  site: PropTypes.object
+};

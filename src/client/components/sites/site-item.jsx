@@ -1,24 +1,32 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Card, Text} from '~gui-library';
 import {Link} from "react-router-dom";
+import { NoneLoaded } from '../none-loaded/none-loaded';
 
-export const SiteDetails = ({site, oilRigs, saveSiteId}) => {
+export const SiteItem = ({site}) => {
   
   return (
-          <li onClick={() => saveSiteId(site.id)} key={site.id}>
-            <Link to={`site/${site.id}`}>
-            <Card>
-              <Text>{site.name}</Text>
-              <p>{site.country}</p>
-              {site.oilRigs.length ? (
-                <ul>
-                  {site.oilRigs.map(rigId => <li key={rigId}>
-                    {(oilRigs[rigId] && oilRigs[rigId].name) && <Card>{oilRigs[rigId].name}</Card>}
-                  </li>)}
-                </ul> 
-              ) : <Text>None rigs</Text>}
-            </Card>
-            </Link>
-          </li>
-        )
+    <li key={site.id}>
+      <Link to={`site/${site.id}`}>
+        <Card>
+          <Text>{site.name}</Text>
+          <p>{site.country}</p>
+          {site.oilRigs.length ? (
+            <ul>
+              {site.oilRigs.map(rig => (rig && rig.id) && 
+                <li key={rig.id}>
+                  <Card>{rig.name}</Card>
+                </li>
+              )}
+            </ul> 
+          ) : <NoneLoaded text='None rigs' />}
+        </Card>
+      </Link>
+    </li>
+  )
 }
+
+SiteItem.propTypes = {
+  site: PropTypes.object
+};

@@ -1,20 +1,17 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {apiCallBegan} from "~store/api";
+import {BASE_URL, SITES_URL} from "../constants";
 
 const slice = createSlice({
   name: 'sites',
   initialState: {
     loading: false,
     list: [],
-    searchString: '',
-    siteDetailsId: ''
+    searchString: ''
   },
   reducers: {
     setSearchString: (sites, action) => {
       sites.searchString = action.payload
-    },
-    setSiteDetailsId: (sites, action) => {
-      sites.siteDetailsId = action.payload
     },
     sitesRequested: (sites) => {
       sites.loading = true;
@@ -36,11 +33,9 @@ export const {
 } = slice.actions;
 export default slice.reducer;
 
-const baseUrl = 'http://localhost:3000/api';
-const url = '/sites';
 export const sitesLoaded = () => apiCallBegan({
-  baseUrl,
-  url,
+  baseUrl: BASE_URL,
+  url: SITES_URL,
   onStart: sitesRequested.type,
   onSuccess: sitesReceived.type,
   onError: sitesRequestFailed.type,

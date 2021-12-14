@@ -1,42 +1,53 @@
 import { createSelector } from '@reduxjs/toolkit';
+import {groupBy} from 'lodash';
 
-const selectSelf = (state) => state.entities.sites;
-const selectSites = (state) => state.entities.sites.list;
-const selectOilRigs = (state) => state.entities.oilRigs.listOfRigs;
-export const selectSearchString = (state) => state.entities.sites.searchString;
+const selectSitesState = (state) => {
+  return state?.entities?.sites || []
+};
 
-export const selectFilteredSites = createSelector(
-  selectSearchString,
-  selectSites,
-  (search, sites) => search.length > 1 ? sites.filter(site => {
-    const lowerSearch = search.toLowerCase();
-    const lowerNames = site.name.toLowerCase().split(' ');
-    return lowerNames.some(name => name.indexOf(lowerSearch) === 0);
-  }) : sites
+const selectOilRigs = (state) => {
+  const grouped = groupBy(state?.entities?.oilRigs?.listOfRigs, 'id')
+  return grouped
+};
+export const selectSearchString = (state) => state.entities.sites.searchString?.toLowerCase();
+
+const getUrlSiteId = (_, props) => {
+  return props.match.params.id
+};
+
+export const getSitesData = () => createSelector(
+  [selectSitesState, selectOilRigs, selectSearchString],
+  (sites, oilRigs, query) => {
+    const sitesWithRigs = sites?.list.filter(item => {
+      return item.name.toLowerCase().includes(query)
+    })?.map(site => ({
+      ...site, 
+      oilRigs: site.oilRigs.map((rigId) => {
+        return oilRigs[rigId] && oilRigs[rigId][0]
+      })
+    }))
+
+    return sitesWithRigs || [];
+  }
 );
 
-export const selectSiteDetails = createSelector(
-  selectSelf,
-  selectOilRigs,
-  (state, oilRigs) => {
-    const siteDetailsId = state.siteDetailsId;
-    const site = state.list.find(site => site.id === siteDetailsId);
-    const currentOilRigs = oilRigs.reduce((acc, rig) => {
+export const getSelectedSiteDetails = () => createSelector(
+  [getSitesData(), getUrlSiteId],
+  (sites, siteId) => {
+    return sites?.find(sites => sites.id === siteId)
+  }
+);
 
-      for (const siteRigId of site.oilRigs) {
-        if (rig.id === siteRigId) {
-          acc = [...acc, {name: rig.name, details: rig.manufacturer, id: rig.id}]
-        }
-      }
-
-      return acc;
-    }, []);
-
-    return {...site, oilRigs: currentOilRigs}
+export const selectSiteDataForChart = createSelector(
+  selectSitesState,
+  (state) => {
+    return state.list.reduce((acc, site) => {
+      return [...acc, {name: site.name, countOfRigs: site.oilRigs.length || 0}]
+    }, [])
   }
 );
 
 export const selectSitesLoaded = createSelector(
-  selectSelf,
+  selectSitesState,
   (state) => state.loading
 );

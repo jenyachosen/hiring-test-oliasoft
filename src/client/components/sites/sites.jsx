@@ -1,40 +1,33 @@
-import React, {useEffect, useMemo} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {Card, Heading, Column, Row, Spinner, Loader, Input} from '~gui-library';
-import {SiteDetails} from './site-item';
+import React, {useEffect} from 'react';
+import PropTypes from 'prop-types';
+import {useDispatch, useSelector, connect} from 'react-redux';
+import {compose} from 'redux';
+import {withRouter} from 'react-router-dom';
+import {Card, Heading, Column, Row} from '~gui-library';
+import {SiteItem} from './site-item';
 import {sitesLoaded, siteActions} from "~store/entities/sites/sites";
-import {selectSitesLoaded, selectSearchString, selectFilteredSites} from "~store/entities/sites/sites.selectors";
-import {selectOilRigs, selectOilRigsLoaded} from "~store/entities/oil-rigs/oil-rigs.selectors";
+import {selectSitesLoaded, getSitesData, selectSearchString} from "~store/entities/sites/sites.selectors";
+import {selectOilRigsLoaded} from "~store/entities/oil-rigs/oil-rigs.selectors";
 import {oilRigsLoaded} from "~store/entities/oil-rigs/oil-rigs";
 import styles from './sites.module.less';
+import {Load} from '../loader/loader';
+import {SearchInput} from '../search-input/search-input';
+import {NoneLoaded} from '../none-loaded/none-loaded';
 
-const Sites = () => {
+const Sites = ({sites}) => {
   const dispatch = useDispatch();
-  const searchValue = useSelector(selectSearchString);
-  const sites = useSelector(selectFilteredSites);
-  const oilRigs = useSelector(selectOilRigs);
   const loading = useSelector(selectSitesLoaded);
   const loadingOilRigs = useSelector(selectOilRigsLoaded);
-
+  const searchValue = useSelector(selectSearchString);
+  
   useEffect(() => {
     dispatch(sitesLoaded());
     dispatch(oilRigsLoaded());
   }, []);
 
-  const updatedSites = useMemo(() => sites.map(site => {
-    return site;
-  }), [sites, oilRigs]);
-
   const onChangeSearch = (ev) => {
     dispatch(siteActions.setSearchString(ev.target.value));
   }
-
-  const saveSiteId = (id) => {
-    dispatch(siteActions.setSiteDetailsId(id));
-  }
-
-  console.log('updatedSites =>', updatedSites);
-  console.log('listOfRigs =>', oilRigs);
 
   return (
     <Card
@@ -45,29 +38,20 @@ const Sites = () => {
       <Row>
         <Column>
           {loading || loadingOilRigs ? 
-          <Loader text="Loading..." theme="light">
-            <Spinner dark />
-          </Loader> : 
+          <Load /> : 
           <div className={styles.sitesList}>
-            <Input 
-              value={searchValue}
-              placeholder='Find site'
-              name='search-sites' 
-              onChange={onChangeSearch}
-            />
-            {sites.length && Object.keys(oilRigs).length ? (
+            <SearchInput value={searchValue} onChange={onChangeSearch} />
+            {sites.length ? (
               <ul>
-                {sites.map(site => (
-                  <SiteDetails 
-                    saveSiteId={saveSiteId}
-                    key={site.id} 
+                {sites.map((site, index) => (
+                  <SiteItem
+                    key={index} 
                     site={site} 
-                    oilRigs={oilRigs} 
                   />
                 ))}
               </ul>
             ) : (
-              <em>None loaded</em>
+              <NoneLoaded text='None loaded' />
             )}
           </div>}
         </Column>
@@ -76,4 +60,20 @@ const Sites = () => {
   );
 }
 
-export {Sites};
+Sites.propTypes = {
+  sites: PropTypes.array
+};
+
+const mapStateToProps = () => {
+  const getSites = getSitesData();
+  return (state, props) => {
+    return {
+      sites: getSites(state, props)
+    };
+  };
+};
+
+export default compose(
+  withRouter,
+  connect(mapStateToProps, null),
+)(Sites);
